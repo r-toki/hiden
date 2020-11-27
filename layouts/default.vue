@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="h-100 d-flex flex-column">
     <TheHeader />
-    <Nuxt v-if="isLoggedIn" />
+    <Nuxt v-if="isLoggedIn" class="flex-fill" />
   </div>
 </template>
 
@@ -30,3 +30,12 @@ export default {
   },
 }
 </script>
+
+<style>
+html,
+body,
+#__nuxt,
+#__layout {
+  height: 100%;
+}
+</style>
