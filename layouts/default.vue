@@ -1,55 +1,32 @@
 <template>
   <div>
-    <Nuxt />
+    <TheHeader />
+    <Nuxt v-if="isLoggedIn" />
   </div>
 </template>
 
-<style>
-html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
-}
+<script>
+import firebase, { usersRef } from '@/plugins/firebase'
+import { mapGetters, mapActions } from 'vuex'
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
+export default {
+  computed: {
+    ...mapGetters('auth', ['isLoggedIn']),
+  },
+  created() {
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        const { uid, displayName } = user
+        await usersRef.doc(uid).set({ displayName })
+        await this.setCurrentUser({ id: uid, displayName })
+      } else {
+        await this.setCurrentUser(null)
+        this.$router.push('/')
+      }
+    })
+  },
+  methods: {
+    ...mapActions('auth', ['setCurrentUser']),
+  },
 }
-
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
-}
-
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
-
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
-}
-
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
-}
-</style>
+</script>
