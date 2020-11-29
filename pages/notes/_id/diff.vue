@@ -40,14 +40,19 @@
         </b-badge>
       </span>
       <br />
-      <span v-for="(postTag, index) in postHistory.tags" :key="index">
-        <b-badge
-          class="mr-1"
-          :variant="preHistory.tags.includes(postTag) ? 'secondary' : 'primary'"
-        >
-          {{ postTag }}
-        </b-badge>
-      </span>
+      <div v-if="isTagsDifferent">
+        <span v-for="(postTag, index) in postHistory.tags" :key="index">
+          <b-badge
+            class="mr-1"
+            :variant="
+              preHistory.tags.includes(postTag) ? 'secondary' : 'primary'
+            "
+          >
+            {{ postTag }}
+          </b-badge>
+        </span>
+      </div>
+
       <hr />
 
       <h5 class="text-muted">Content</h5>
@@ -100,6 +105,12 @@ export default {
     },
     diffContent() {
       return Diff.diffLines(this.preHistory.content, this.postHistory.content)
+    },
+    isTagsDifferent() {
+      return (
+        JSON.stringify(this.preHistory.tags) !==
+        JSON.stringify(this.postHistory.tags)
+      )
     },
   },
   methods: {

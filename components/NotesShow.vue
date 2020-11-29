@@ -19,13 +19,12 @@
             </b-card-title>
 
             <div class="mb-3">
-              <b-button
+              <b-badge
                 v-for="(tag, index) in note.latestHistory.tags"
                 :key="index"
                 class="mr-1"
-                size="sm"
                 variant="success"
-                >{{ tag }}</b-button
+                >{{ tag }}</b-badge
               >
             </div>
 
