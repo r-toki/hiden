@@ -27,6 +27,7 @@
                 >{{ tag }}</b-badge
               >
             </div>
+            <hr />
 
             <div class="text-muted mb-1 clearfix">
               <span class="float-left">
@@ -47,6 +48,8 @@
                 <div>作成日: {{ formatDate(note.createdAt) }}</div>
               </span>
             </div>
+            <hr />
+
             <b-card-text>
               <!-- eslint-disable vue/no-v-html -->
               <div
