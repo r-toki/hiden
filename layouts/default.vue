@@ -2,6 +2,7 @@
   <div class="h-100 d-flex flex-column">
     <TheHeader />
     <Nuxt v-if="isLoggedIn" class="flex-fill" />
+    <h1 v-else class="text-center">Hiden no Tare</h1>
   </div>
 </template>
 

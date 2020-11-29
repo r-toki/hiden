@@ -1,6 +1,6 @@
 <template>
   <b-container class="mb-3 d-flex flex-column">
-    <h2 class="text-center">ノートの投稿</h2>
+    <h2 class="text-center">ノート新規作成</h2>
     <b-form
       class="flex-fill d-flex flex-column"
       @submit.prevent="onClickPostButton"
@@ -50,14 +50,16 @@ export default {
   },
   methods: {
     async onClickPostButton() {
+      const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp()
       const latestNote = {
         title: this.title,
         content: this.content,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: serverTimestamp,
         userId: this.currentUser.id,
       }
       const { id } = await notesRef.add({
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: serverTimestamp,
+        updatedAt: serverTimestamp,
         userId: this.currentUser.id,
         latestNote,
       })

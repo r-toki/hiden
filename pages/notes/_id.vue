@@ -1,7 +1,7 @@
 <template>
   <div>
     <NotesShow v-if="isShowPage" :id="id" />
-    <NuxtChild />
+    <NuxtChild :id="id" />
   </div>
 </template>
 
