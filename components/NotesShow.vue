@@ -1,9 +1,9 @@
 <template>
-  <b-container v-if="note" class="mb-3">
-    <b-row>
+  <b-container v-if="!loading" class="mb-3">
+    <b-form-row>
       <b-col cols="9">
         <h5>ノート</h5>
-        <b-card v-if="canDisplayNote(note)" no-body class="mb-3">
+        <b-card no-body class="mb-3">
           <template #header>
             <b-icon
               icon="pencil"
@@ -14,27 +14,29 @@
           <b-card-body>
             <b-card-title>
               <h1>
-                {{ note.latestNote.title }}
+                {{ note.latestHistory.title }}
               </h1>
             </b-card-title>
             <div class="text-muted mb-1 clearfix">
               <span class="float-left">
-                <div>作成者: {{ findUserById(note.userId).displayName }}</div>
                 <div>
-                  最終更新者:
-                  {{ findUserById(note.latestNote.userId).displayName }}
+                  作成者:
+                  {{
+                    findUserById(note.userId)
+                      ? findUserById(note.userId).displayName
+                      : ''
+                  }}
                 </div>
               </span>
               <span class="float-right">
                 <div>作成日: {{ formatDate(note.createdAt) }}</div>
-                <div>最終更新日: {{ formatDate(note.updatedAt) }}</div>
               </span>
             </div>
             <b-card-text>
               <!-- eslint-disable vue/no-v-html -->
               <div
                 class="overflow-auto"
-                v-html="$md.render(note.latestNote.content)"
+                v-html="$md.render(note.latestHistory.content)"
               ></div>
               <!-- eslint-enable -->
             </b-card-text>
@@ -44,11 +46,15 @@
         <h5>コメント</h5>
         <b-list-group class="mb-3">
           <b-list-group-item v-for="comment in comments" :key="comment.id">
-            <div v-if="canDisplayComment(comment)">
+            <div>
               <div class="text-muted mb-1">
-                <span>{{ findUserById(comment.userId).displayName }}</span>
+                <span>{{
+                  findUserById(comment.userId)
+                    ? findUserById(comment.userId).displayName
+                    : ''
+                }}</span>
                 <span class="float-right">{{
-                  formatDate(comment.createdAt)
+                  comment.createdAt ? formatDate(comment.createdAt) : ''
                 }}</span>
               </div>
               <div style="white-space: pre-line">{{ comment.content }}</div>
@@ -72,17 +78,25 @@
         <h5>ノート更新履歴</h5>
         <b-list-group>
           <b-list-group-item
-            v-for="pastNote in pastNotesAfterFirst"
-            :key="pastNote.id"
+            v-for="history in historiesAfterFirst"
+            :key="history.id"
           >
-            <div v-if="canDisplayNote(pastNote)" class="cursor-pointer">
-              <div>{{ findUserById(pastNote.userId).displayName }}</div>
-              <div>{{ formatDate(pastNote.createdAt) }}</div>
+            <div class="cursor-pointer">
+              <div>
+                {{
+                  findUserById(history.userId)
+                    ? findUserById(history.userId).displayName
+                    : ''
+                }}
+              </div>
+              <div>
+                {{ history.createdAt ? formatDate(history.createdAt) : '' }}
+              </div>
             </div>
           </b-list-group-item>
         </b-list-group>
       </b-col>
-    </b-row>
+    </b-form-row>
   </b-container>
 </template>
 
@@ -99,44 +113,36 @@ export default {
       users: null,
       note: null,
       comments: null,
-      pastNotes: null,
+      histories: null,
       commentContent: '',
+    }
+  },
+  firestore() {
+    return {
+      users: usersRef,
+      note: notesRef.doc(this.id),
+      comments: notesRef
+        .doc(this.id)
+        .collection('comments')
+        .orderBy('createdAt', 'asc'),
+      histories: notesRef.doc(this.id).collection('histories'),
     }
   },
   computed: {
     ...mapGetters('auth', ['currentUser']),
-    pastNotesAfterFirst() {
-      return this.pastNotes ? [...this.pastNotes].splice(1) : []
+    historiesAfterFirst() {
+      return this.histories ? [...this.histories].splice(1) : []
     },
-  },
-  watch: {
-    id: {
-      immediate: true,
-      handler(id) {
-        this.$bind('note', notesRef.doc(id))
-        this.$bind(
-          'comments',
-          notesRef.doc(id).collection('comments').orderBy('createdAt', 'asc')
-        )
-        this.$bind(
-          'pastNotes',
-          notesRef.doc(id).collection('pastNotes').orderBy('createdAt', 'asc')
-        )
-      },
+    loading() {
+      return !(this.users && this.note && this.comments && this.histories)
     },
   },
   methods: {
     findUserById(id) {
       return this.users.find((user) => user.id === id)
     },
-    canDisplayNote(note) {
-      return note && this.findUserById(note.userId) && note.createdAt
-    },
     formatDate(timestamp) {
       return dayjs(timestamp.toDate()).format('YYYY/MM/DD HH:mm')
-    },
-    canDisplayComment(comment) {
-      return this.findUserById(comment.userId) && comment.createdAt
     },
     onClickEdit() {
       this.$router.push({
@@ -152,9 +158,6 @@ export default {
       })
       this.commentContent = ''
     },
-  },
-  firestore: {
-    users: usersRef,
   },
 }
 </script>

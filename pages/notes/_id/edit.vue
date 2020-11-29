@@ -55,47 +55,45 @@ export default {
       content: '',
     }
   },
+  firestore() {
+    return {
+      note: notesRef.doc(this.id),
+    }
+  },
   computed: {
     ...mapGetters('auth', ['currentUser']),
     hasDifference() {
       return this.note
-        ? this.note.latestNote.title !== this.title ||
-            this.note.latestNote.content !== this.content
+        ? this.note.latestHistory.title !== this.title ||
+            this.note.latestHistory.content !== this.content
         : true
     },
   },
   watch: {
-    // ドキュメントの bind 方法はこれが正しいの？公式にはこう書いてあったけど
-    id: {
-      immediate: true,
-      handler(id) {
-        this.$bind('note', notesRef.doc(id))
-      },
-    },
     note(newVal, oldVal) {
       // title と content の初期化処理。note が bind された後に一回だけ実行したい
       if (!oldVal && newVal) {
-        this.title = newVal.latestNote.title
-        this.content = newVal.latestNote.content
+        this.title = newVal.latestHistory.title
+        this.content = newVal.latestHistory.content
       }
     },
   },
   methods: {
     async onClickUpdate() {
       const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp()
-      const latestNote = {
+      const latestHistory = {
         title: this.title,
         content: this.content,
         createdAt: serverTimestamp,
         userId: this.currentUser.id,
       }
       await this.$firestoreRefs.note.update({
-        latestNote,
+        latestHistory,
         updatedAt: serverTimestamp,
       })
       await this.$firestoreRefs.note
-        .collection('pastNotes')
-        .add({ ...latestNote })
+        .collection('histories')
+        .add({ ...latestHistory })
       this.$router.push({ name: 'notes-id', params: { id: this.id } })
     },
   },

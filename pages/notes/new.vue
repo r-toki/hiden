@@ -51,7 +51,7 @@ export default {
   methods: {
     async onClickPostButton() {
       const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp()
-      const latestNote = {
+      const latestHistory = {
         title: this.title,
         content: this.content,
         createdAt: serverTimestamp,
@@ -61,12 +61,12 @@ export default {
         createdAt: serverTimestamp,
         updatedAt: serverTimestamp,
         userId: this.currentUser.id,
-        latestNote,
+        latestHistory,
       })
       await notesRef
         .doc(id)
-        .collection('pastNotes')
-        .add({ ...latestNote })
+        .collection('histories')
+        .add({ ...latestHistory })
       this.$router.push({ name: 'notes-id', params: { id } })
     },
   },

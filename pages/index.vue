@@ -4,7 +4,7 @@
     <b-list-group v-if="notes">
       <b-list-group-item v-for="note in notes" :key="note.id">
         <NuxtLink :to="{ name: 'notes-id', params: { id: note.id } }">
-          <h5>{{ note.latestNote.title }}</h5>
+          <h5>{{ note.latestHistory.title }}</h5>
         </NuxtLink>
         <div class="text-muted">
           <div v-if="note.updatedAt">
