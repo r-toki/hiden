@@ -3,7 +3,7 @@
     <NuxtLink :to="{ name: 'notes-id', params: { id } }">戻る</NuxtLink>
     <h1 class="text-center">ノート更新履歴</h1>
     <b-card>
-      <div class="text-muted">
+      <div class="text-muted mb-3">
         <div>
           更新者:
           <NuxtLink
@@ -21,6 +21,8 @@
           {{ postHistory.createdAt ? formatDate(postHistory.createdAt) : '' }}
         </div>
       </div>
+
+      <h5 class="text-muted">Title</h5>
       <div v-for="(part, index) in diffTitle" :key="index">
         <div :class="{ added: part.added, removed: part.removed }">
           <h1 style="white-space: pre-line">{{ part.value }}</h1>
@@ -28,6 +30,27 @@
       </div>
       <hr />
 
+      <h5 class="text-muted">Tags</h5>
+      <span v-for="(preTag, index) in preHistory.tags" :key="index">
+        <b-badge
+          class="mr-1"
+          :variant="postHistory.tags.includes(preTag) ? 'secondary' : 'danger'"
+        >
+          {{ preTag }}
+        </b-badge>
+      </span>
+      <br />
+      <span v-for="(postTag, index) in postHistory.tags" :key="index">
+        <b-badge
+          class="mr-1"
+          :variant="preHistory.tags.includes(postTag) ? 'secondary' : 'primary'"
+        >
+          {{ postTag }}
+        </b-badge>
+      </span>
+      <hr />
+
+      <h5 class="text-muted">Content</h5>
       <div v-for="(part, index) in diffContent" :key="index">
         <div :class="{ added: part.added, removed: part.removed }">
           <div style="white-space: pre-line">{{ part.value }}</div>

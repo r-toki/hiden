@@ -61,7 +61,7 @@ export default {
       const latestHistory = {
         title: this.title,
         content: this.content,
-        tags: this.tags,
+        tags: this.tags.sort(),
         createdAt: serverTimestamp,
         userId: this.currentUser.id,
       }

@@ -75,6 +75,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['currentUser']),
     hasDifference() {
+      // すごい長い。title, content, tags に差分があるかを評価
       return this.note
         ? this.note.latestHistory.title !== this.title ||
             this.note.latestHistory.content !== this.content ||
@@ -89,7 +90,7 @@ export default {
       if (!oldVal && newVal) {
         this.title = newVal.latestHistory.title
         this.content = newVal.latestHistory.content
-        this.tags = newVal.latestHistory.tags
+        this.tags = [...newVal.latestHistory.tags]
       }
     },
   },
@@ -99,6 +100,7 @@ export default {
       const latestHistory = {
         title: this.title,
         content: this.content,
+        tags: this.tags.sort(),
         createdAt: serverTimestamp,
         userId: this.currentUser.id,
       }
