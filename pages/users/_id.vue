@@ -1,7 +1,9 @@
 <template>
   <b-container v-if="user" style="max-width: 720px">
     <h1 class="text-center">{{ user.displayName }}</h1>
-    <h5>作成したノート</h5>
+    <h5>
+      作成したノート: {{ notesCreatedByUser ? notesCreatedByUser.length : '' }}
+    </h5>
     <b-list-group>
       <b-list-group-item v-for="note in notesCreatedByUser" :key="note.id">
         <NuxtLink :to="{ name: 'notes-id', params: { id: note.id } }">

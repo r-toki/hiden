@@ -1,5 +1,10 @@
 <template>
   <b-container v-if="note" class="h-100 pb-3 d-flex flex-column">
+    <NuxtLink
+      :to="{ name: 'notes-id', params: { id } }"
+      class="align-self-start"
+      >戻る</NuxtLink
+    >
     <h2 class="text-center">ノート更新</h2>
     <b-form
       class="flex-fill d-flex flex-column"
@@ -11,6 +16,12 @@
         required
         class="mb-3"
       ></b-form-input>
+      <b-form-tags
+        v-model="tags"
+        placeholder="Tag"
+        tag-variant="success"
+        class="mb-3"
+      ></b-form-tags>
       <b-row class="flex-fill">
         <b-col class="pr-0">
           <b-form-textarea
@@ -31,7 +42,7 @@
       <div>
         <b-button
           type="submit"
-          variant="success"
+          variant="primary"
           class="mt-2 float-right"
           :disabled="!hasDifference"
           >更新する</b-button
@@ -53,6 +64,7 @@ export default {
       note: null,
       title: '',
       content: '',
+      tags: [],
     }
   },
   firestore() {
@@ -65,7 +77,9 @@ export default {
     hasDifference() {
       return this.note
         ? this.note.latestHistory.title !== this.title ||
-            this.note.latestHistory.content !== this.content
+            this.note.latestHistory.content !== this.content ||
+            JSON.stringify([...this.note.latestHistory.tags].sort()) !==
+              JSON.stringify([...this.tags].sort())
         : true
     },
   },
@@ -75,6 +89,7 @@ export default {
       if (!oldVal && newVal) {
         this.title = newVal.latestHistory.title
         this.content = newVal.latestHistory.content
+        this.tags = newVal.latestHistory.tags
       }
     },
   },

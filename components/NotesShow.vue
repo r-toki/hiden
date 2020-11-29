@@ -17,15 +17,31 @@
                 {{ note.latestHistory.title }}
               </h1>
             </b-card-title>
+
+            <div class="mb-3">
+              <b-button
+                v-for="(tag, index) in note.latestHistory.tags"
+                :key="index"
+                class="mr-1"
+                size="sm"
+                variant="success"
+                >{{ tag }}</b-button
+              >
+            </div>
+
             <div class="text-muted mb-1 clearfix">
               <span class="float-left">
                 <div>
                   作成者:
-                  {{
-                    findUserById(note.userId)
-                      ? findUserById(note.userId).displayName
-                      : ''
-                  }}
+                  <NuxtLink
+                    :to="{ name: 'users-id', params: { id: note.userId } }"
+                  >
+                    {{
+                      findUserById(note.userId)
+                        ? findUserById(note.userId).displayName
+                        : ''
+                    }}
+                  </NuxtLink>
                 </div>
               </span>
               <span class="float-right">
@@ -48,11 +64,17 @@
           <b-list-group-item v-for="comment in comments" :key="comment.id">
             <div>
               <div class="text-muted mb-1">
-                <span>{{
-                  findUserById(comment.userId)
-                    ? findUserById(comment.userId).displayName
-                    : ''
-                }}</span>
+                <span>
+                  <NuxtLink
+                    :to="{ name: 'users-id', params: { id: note.userId } }"
+                  >
+                    {{
+                      findUserById(comment.userId)
+                        ? findUserById(comment.userId).displayName
+                        : ''
+                    }}
+                  </NuxtLink>
+                </span>
                 <span class="float-right">{{
                   comment.createdAt ? formatDate(comment.createdAt) : ''
                 }}</span>
@@ -67,6 +89,7 @@
           <b-form-textarea
             v-model="commentContent"
             class="mb-3"
+            required
           ></b-form-textarea>
           <b-button type="submit" class="float-right" variant="primary"
             >投稿する</b-button
@@ -81,7 +104,7 @@
             v-for="history in historiesAfterFirst"
             :key="history.id"
           >
-            <div class="cursor-pointer">
+            <div class="cursor-pointer" @click="onClickHistory(history)">
               <div>
                 {{
                   findUserById(history.userId)
@@ -124,14 +147,17 @@ export default {
       comments: notesRef
         .doc(this.id)
         .collection('comments')
-        .orderBy('createdAt', 'asc'),
-      histories: notesRef.doc(this.id).collection('histories'),
+        .orderBy('createdAt', 'desc'),
+      histories: notesRef
+        .doc(this.id)
+        .collection('histories')
+        .orderBy('createdAt', 'desc'),
     }
   },
   computed: {
     ...mapGetters('auth', ['currentUser']),
     historiesAfterFirst() {
-      return this.histories ? [...this.histories].splice(1) : []
+      return this.histories ? [...this.histories].slice(0, -1) : []
     },
     loading() {
       return !(this.users && this.note && this.comments && this.histories)
@@ -157,6 +183,20 @@ export default {
         userId: this.currentUser.id,
       })
       this.commentContent = ''
+    },
+    onClickHistory(history) {
+      // histories は更新日が新しい順に並んでいる
+      const postHistoryIndex = this.histories.findIndex(
+        (_history) => _history === history
+      )
+      const preHistoryIndex = postHistoryIndex + 1
+      const post = this.histories[postHistoryIndex].id
+      const pre = this.histories[preHistoryIndex].id
+      this.$router.push({
+        name: 'notes-id-diff',
+        params: { id: this.id },
+        query: { post, pre },
+      })
     },
   },
 }

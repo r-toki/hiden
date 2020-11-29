@@ -7,14 +7,21 @@
     >
       <b-form-input
         v-model="title"
-        placeholder="Title"
         required
+        placeholder="Title"
         class="mb-3"
       ></b-form-input>
+      <b-form-tags
+        v-model="tags"
+        placeholder="Tag"
+        tag-variant="success"
+        class="mb-3"
+      ></b-form-tags>
       <b-row class="flex-fill">
         <b-col class="pr-0">
           <b-form-textarea
             v-model="content"
+            required
             class="h-100"
             placeholder="Content"
           ></b-form-textarea>
@@ -29,7 +36,7 @@
         </b-col>
       </b-row>
       <div>
-        <b-button type="submit" variant="success" class="mt-2 float-right"
+        <b-button type="submit" variant="primary" class="mt-2 float-right"
           >投稿する</b-button
         >
       </div>
@@ -43,7 +50,7 @@ import firebase, { notesRef } from '@/plugins/firebase'
 
 export default {
   data() {
-    return { title: '', content: '' }
+    return { title: '', content: '', tags: [] }
   },
   computed: {
     ...mapGetters('auth', ['currentUser']),
@@ -54,6 +61,7 @@ export default {
       const latestHistory = {
         title: this.title,
         content: this.content,
+        tags: this.tags,
         createdAt: serverTimestamp,
         userId: this.currentUser.id,
       }
