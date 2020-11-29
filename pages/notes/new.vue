@@ -20,10 +20,12 @@
           ></b-form-textarea>
         </b-col>
         <b-col class="pl-0 h-100">
+          <!-- eslint-disable vue/no-v-html -->
           <div
             class="preview py-2 px-2 mr-3 border rounded"
             v-html="$md.render(content)"
           ></div>
+          <!-- eslint-enable -->
         </b-col>
       </b-row>
       <div>
