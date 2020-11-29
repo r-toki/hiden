@@ -63,6 +63,10 @@ export default {
         userId: this.currentUser.id,
         latestNote,
       })
+      await notesRef
+        .doc(id)
+        .collection('pastNotes')
+        .add({ ...latestNote })
       this.$router.push({ name: 'notes-id', params: { id } })
     },
   },

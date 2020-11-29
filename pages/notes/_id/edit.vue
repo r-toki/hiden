@@ -89,14 +89,13 @@ export default {
         createdAt: serverTimestamp,
         userId: this.currentUser.id,
       }
-      const previousLatestNote = this.note.latestNote
       await this.$firestoreRefs.note.update({
         latestNote,
         updatedAt: serverTimestamp,
       })
       await this.$firestoreRefs.note
         .collection('pastNotes')
-        .add({ ...previousLatestNote })
+        .add({ ...latestNote })
       this.$router.push({ name: 'notes-id', params: { id: this.id } })
     },
   },

@@ -51,7 +51,7 @@
                   formatDate(comment.createdAt)
                 }}</span>
               </div>
-              <div>{{ comment.content }}</div>
+              <div style="white-space: pre-line">{{ comment.content }}</div>
             </div>
           </b-list-group-item>
         </b-list-group>
@@ -71,7 +71,10 @@
       <b-col cols="3">
         <h5>ノート更新履歴</h5>
         <b-list-group>
-          <b-list-group-item v-for="pastNote in pastNotes" :key="pastNote.id">
+          <b-list-group-item
+            v-for="pastNote in pastNotesAfterFirst"
+            :key="pastNote.id"
+          >
             <div v-if="canDisplayNote(pastNote)" class="cursor-pointer">
               <div>{{ findUserById(pastNote.userId).displayName }}</div>
               <div>{{ formatDate(pastNote.createdAt) }}</div>
@@ -102,6 +105,9 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['currentUser']),
+    pastNotesAfterFirst() {
+      return this.pastNotes ? [...this.pastNotes].splice(1) : []
+    },
   },
   watch: {
     id: {
