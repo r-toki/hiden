@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container style="max-width: 720px">
     <h1 class="text-center">Hiden no Tare</h1>
     <b-list-group v-if="notes">
       <b-list-group-item v-for="note in notes" :key="note.id">
@@ -7,8 +7,8 @@
           <h5>{{ note.latestHistory.title }}</h5>
         </NuxtLink>
         <div class="text-muted">
-          <div v-if="note.updatedAt">
-            最終更新日: {{ formatDate(note.updatedAt) }}
+          <div>
+            更新日: {{ note.updatedAt ? formatDate(note.updatedAt) : '' }}
           </div>
         </div>
       </b-list-group-item>

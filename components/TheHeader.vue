@@ -5,7 +5,10 @@
         <template v-if="isLoggedIn">
           <b-nav-item :to="{ name: 'index' }">ホーム</b-nav-item>
           <b-nav-item :to="{ name: 'notes-new' }">新規作成</b-nav-item>
-          <b-nav-item>{{ currentUser.displayName }}</b-nav-item>
+          <b-nav-item
+            :to="{ name: 'users-id', params: { id: currentUser.id } }"
+            >{{ currentUser.displayName }}</b-nav-item
+          >
           <b-nav-item @click="signOut">Sign Out</b-nav-item>
         </template>
         <b-nav-item v-else @click="signIn">Sign In</b-nav-item>
